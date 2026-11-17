@@ -1,0 +1,253 @@
+/* 行程封面：地名首字印章 + 地方风景线稿，纸面排印，不依赖图片。 */
+.cover {
+  --cover-cut: var(--color-paper);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  isolation: isolate;
+}
+
+.cover[data-tone="1"] {
+  --cover-cut: var(--color-paper-2);
+  background: var(--color-paper-2);
+}
+
+.cover[data-tone="2"] {
+  --cover-cut: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.cover[data-tone="3"] {
+  --cover-cut: var(--color-indigo);
+  background: var(--color-indigo);
+  color: var(--color-accent-ink);
+}
+
+.cover[data-tone="4"] {
+  --cover-cut: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-accent-ink);
+}
+
+/* 字徽占据右侧，左侧留给城市名；遮罩让线稿淡出，避免压字。 */
+.art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 20%, #000 56%);
+}
+
+.scene {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: .8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .36;
+}
+
+.cover[data-tone="2"] .scene,
+.cover[data-tone="3"] .scene,
+.cover[data-tone="4"] .scene {
+  stroke: currentColor;
+  opacity: .3;
+}
+
+.horizon,
+.mist {
+  opacity: .55;
+}
+
+.mist {
+  stroke-dasharray: 1.5 2.5;
+}
+
+.secondary,
+.rays,
+.windows {
+  opacity: .6;
+}
+
+.dot {
+  fill: currentColor;
+  stroke: none;
+  opacity: .5;
+}
+
+.sealRing {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: .7;
+  stroke-dasharray: 2 2.4;
+  opacity: .6;
+}
+
+.sealDot {
+  fill: var(--color-accent);
+  opacity: .75;
+}
+
+.cover[data-tone="2"] .sealRing,
+.cover[data-tone="3"] .sealRing,
+.cover[data-tone="4"] .sealRing {
+  stroke: currentColor;
+}
+
+.cover[data-tone="2"] .sealDot,
+.cover[data-tone="3"] .sealDot,
+.cover[data-tone="4"] .sealDot {
+  fill: currentColor;
+}
+
+.glyph {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* 套印错位：红色/浅色重影垫在墨字下面，让字徽像手工印上去的。 */
+.glyphGhost {
+  fill: var(--color-accent);
+  opacity: .5;
+}
+
+.cover[data-tone="2"] .glyphGhost,
+.cover[data-tone="3"] .glyphGhost,
+.cover[data-tone="4"] .glyphGhost {
+  fill: currentColor;
+  opacity: .25;
+}
+
+.glyphFill {
+  fill: currentColor;
+}
+
+.glyphOutline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: .55;
+}
+
+/* 字内纹理：用封面底色“刻”掉线条，形成木刻/印章的断面。 */
+.texture {
+  fill: none;
+  stroke: var(--cover-cut);
+  stroke-width: .5;
+  stroke-linecap: round;
+  opacity: .9;
+}
+
+.textureDot {
+  fill: var(--cover-cut);
+  stroke: none;
+}
+
+.head,
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+.kicker {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.city {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  margin: 0;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 6vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  opacity: .85;
+}
+
+.hero {
+  padding: var(--space-5);
+}
+
+.hero .city {
+  font-size: 2rem;
+}
+
+.thumb {
+  width: 72px;
+  height: 54px;
+  aspect-ratio: auto;
+  padding: var(--space-2);
+}
+
+.thumb .art {
+  mask-image: none;
+}
+
+.thumb .scene,
+.thumb .seal {
+  display: none;
+}
+
+.thumb .glyph {
+  font-size: 26px;
+}
+
+.thumb .glyphGhost {
+  opacity: .35;
+}
+
+.thumb .city {
+  font-size: .75rem;
+  line-height: 1.2;
+}
+
+.thumb .head {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero .city {
+    font-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover {
+    transition: none;
+  }
+}

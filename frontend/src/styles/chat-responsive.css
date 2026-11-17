@@ -1,0 +1,13 @@
+@media (max-width: 800px) {
+
+  .chat-message {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .chat-message {
+    max-width: 100%;
+  }
+}

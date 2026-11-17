@@ -1,0 +1,76 @@
+/* 提示条：ink 底纸白字，贴在底部导航与键盘上方。
+   层级契约：分享遮罩 120、Dialog 130、全屏探索页 1000、地点详情 1001，
+   提示条必须盖过这些临时层，否则在弹层里触发的「已复制」等反馈会被遮住。 */
+.viewport {
+  position: fixed;
+  z-index: 1100;
+  right: 0;
+  bottom: calc(56px + var(--space-3) + var(--kb-inset) + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-5);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 32rem;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: var(--rule-hair) solid var(--color-ink);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  color: var(--color-paper-3);
+  pointer-events: auto;
+  animation: toast-in var(--dur-base) var(--ease-out);
+}
+
+.info {
+  border-color: var(--color-ink);
+}
+
+.success {
+  border-color: var(--color-success);
+}
+
+.error {
+  border-color: var(--color-danger);
+}
+
+.message {
+  flex: 1 1 auto;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.close {
+  flex: none;
+  color: var(--color-paper-3);
+}
+
+.close:hover:not(:disabled) {
+  background: var(--color-ink-2);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

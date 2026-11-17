@@ -1,0 +1,24 @@
+.skeleton {
+  display: block;
+  min-height: 1em;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  animation: breathe 1.8s var(--ease-step) infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

@@ -1,0 +1,38 @@
+# 本地配置与密钥
+.env
+.env.*
+!.env.example
+.session-secret
+.local-https/
+
+# 数据库与备份
+*.db
+*.db-wal
+*.db-shm
+backups/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+pytest-cache-files-*/
+.pytest-tmp/
+.audit-findings/
+
+# Node / 前端构建产物
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# 运行日志与临时文件
+*.log
+.tmp-*
+.hallmark/
+
+# 内部开发资料（不进入首次公开提交）
+docs/
+
+# 编辑器与系统文件
+.DS_Store
+Thumbs.db

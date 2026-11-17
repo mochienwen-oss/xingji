@@ -1,0 +1,805 @@
+/* 分享页 D3：纸底、编辑式大标题、1px hairline 分隔；底部 CTA 常驻 56px + safe-area。 */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* 顶栏：返回 / 字标 / 语言切换 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: var(--rule-hair, 1px) solid var(--color-rule);
+  background: var(--color-paper);
+}
+
+.topbarInner {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 760px;
+  min-height: 56px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.back {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-card);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.back:hover {
+  background: var(--color-paper-2);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 44px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+/* 顶栏只留一个安静的字标：老品牌条那枚红底方块在这里过重。 */
+.wordmark :global(.brand-mark) {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--color-ink);
+}
+
+.wordmark :global(svg) {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.wordmarkText {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.wordmark:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-card);
+}
+
+.langGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: var(--rule-hair, 1px) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.langButton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+/* 选中的语言用纸面加深，不用深色胶囊，避免页头看起来像老品牌条。 */
+.langButton[aria-pressed='true'] {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-ink-rule);
+}
+
+.langButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+/* 正文：单栏阅读宽度，移动优先 */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-7);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.shareLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 22px;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.readonlyChip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border: var(--rule-hair, 1px) solid var(--color-ink-rule);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.coverFrame {
+  border: var(--rule-hair, 1px) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-paper-2);
+}
+
+/* 封面按 spec 用 3:2，覆盖 TripCover 默认的 4:3（保留其 hero 字号）。 */
+.coverFrame .coverFill {
+  aspect-ratio: 3 / 2;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.125rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* 首屏事实条：天数 / 地点 / 总里程，让读者三秒内判断这份行程的体量。 */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: var(--space-3) 0;
+  border-block: var(--rule-hair, 1px) solid var(--color-rule);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  min-width: 0;
+  padding-inline: var(--space-4);
+  border-left: var(--rule-hair, 1px) solid var(--color-rule);
+}
+
+.fact:first-child {
+  padding-inline-start: 0;
+  border-left: 0;
+}
+
+.fact dt {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  letter-spacing: .04em;
+}
+
+.fact dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+
+.metaDot {
+  color: var(--color-ink-rule);
+}
+
+/* 地图：移动端 240，桌面 320；地图内控件由 MapView 自己处理 */
+.mapSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.sectionKicker {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.mapFrame {
+  position: relative;
+  height: 240px;
+  border: var(--rule-hair, 1px) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-paper-2);
+}
+
+.mapFrame :global(.map-wrap) {
+  height: 100%;
+  border-bottom: 0;
+  border-radius: 0;
+}
+
+.mapFrame :global(.map) {
+  height: 100%;
+}
+
+.mapFrame :global(.map-caption) {
+  display: none;
+}
+
+.mapCredit {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* 日程 */
+.itinerary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-4);
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  border-bottom: var(--rule-hair, 1px) solid var(--color-ink-rule);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs button {
+  flex: none;
+  min-height: 44px;
+  margin-bottom: -1px;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  color: var(--color-ink);
+}
+
+.tabs button[aria-selected='true'] {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-accent);
+}
+
+.tabs button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.tabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.tabPanel:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.dayBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.dayHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.dayTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dayDate {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stops {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--rule-hair, 1px) solid var(--color-rule);
+}
+
+.stopRow {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4) 0;
+  border-bottom: var(--rule-hair, 1px) solid var(--color-rule);
+}
+
+.stopNumber {
+  padding-top: 3px;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+.stopBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.stopTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.address {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.stopFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.stopFact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.factLabel {
+  color: var(--color-muted);
+}
+
+.stopFact time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.late {
+  color: var(--color-danger);
+}
+
+.stopLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.mapLink {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.mapLink:hover {
+  color: var(--color-accent);
+}
+
+.mapLink:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.routeConnector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.emptyDay {
+  margin: 0;
+  padding: var(--space-3) 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.aiNotice {
+  margin-top: var(--space-3);
+}
+
+.disclaimer {
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: var(--rule-hair, 1px) solid var(--color-rule);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+}
+
+.footnote {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+}
+
+/* 举报入口：低调的文字按钮，44px 触控高度，不抢主 CTA。 */
+.reportLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: 400 var(--text-sm)/1.4 var(--font-body);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.reportLink:hover {
+  color: var(--color-ink-2);
+  text-decoration-color: currentColor;
+}
+
+.reportLink:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* 加载 / 失效 / 失败：不白屏，也不显示原始错误 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skeletonCover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+}
+
+.skeletonTitle {
+  display: block;
+  width: 66%;
+  height: 2rem;
+}
+
+.skeletonLine {
+  display: block;
+  width: 100%;
+  height: .875rem;
+}
+
+.skeletonLineShort {
+  display: block;
+  width: 58%;
+  height: .875rem;
+}
+
+.loadingText {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.stateColumn {
+  width: 100%;
+  padding: var(--space-5) 0;
+}
+
+.primaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  border: var(--rule-hair, 1px) solid var(--color-accent);
+  border-radius: var(--radius-card);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.primaryLink:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+}
+
+.primaryLink:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+
+/* 底部 CTA：常驻 56px，留 safe-area，正文不被压住（在文档流内 sticky） */
+.ctaDock {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  margin-top: auto;
+  padding: var(--space-2) var(--space-4) calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+  border-top: var(--rule-hair, 1px) solid var(--color-ink-rule);
+  background: var(--color-paper-3);
+}
+
+.ctaInner {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.ctaRow,
+.ctaRowSingle {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ctaRow {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.ctaRowSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ctaRow > *,
+.ctaRowSingle > * {
+  min-width: 0;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 var(--space-4);
+  border: var(--rule-hair, 1px) solid var(--color-accent);
+  border-radius: var(--radius-card);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ctaPrimary:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+}
+
+.ctaPrimary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.ctaButton {
+  width: 100%;
+  min-height: 56px;
+}
+
+.copyProblem {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--rule-hair, 1px) solid var(--color-rule);
+}
+
+.copyProblemText {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.shareLabel {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.shareInput {
+  width: 100%;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.signInButton,
+.linkCopyButton {
+  justify-self: start;
+  min-height: 44px;
+}
+
+.toastHost {
+  position: fixed;
+  left: 50%;
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  width: min(calc(100% - var(--space-6)), 26rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toastHost > * {
+  pointer-events: auto;
+}
+
+@media (max-width: 379px) {
+  .ctaRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    gap: var(--space-7);
+    padding: var(--space-6) var(--space-6) var(--space-8);
+  }
+
+  .title {
+    font-size: 2.75rem;
+  }
+
+  .mapFrame {
+    height: 320px;
+  }
+
+  .stopRow {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .ctaDock {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  .ctaRow,
+  .ctaRowSingle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .langButton,
+  .mapLink,
+  .tabs button {
+    transition: none;
+  }
+}

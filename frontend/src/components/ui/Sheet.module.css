@@ -1,0 +1,192 @@
+/* 底部抽屉：遮罩 + 三档高度 + 拖拽位移，颜色全部来自 tokens。 */
+/*
+ * 抽屉常驻挂载：整层默认不接收指针，只有抽屉本体（以及可关闭时的遮罩）可点，
+ * 这样 peek 状态下的地图仍然能拖，也不会被透明层吞掉点击。
+ */
+.layer {
+  position: fixed;
+  inset: 0;
+  padding-bottom: var(--bottom-nav, 0px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* 模态档（有遮罩、有关闭键）压到底部导航之上，遮罩不会只挡住一半。 */
+.layer.modal {
+  z-index: 40;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-scrim);
+  opacity: 0.32;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--color-paper);
+  box-shadow: 0 -1px 0 var(--color-rule);
+  pointer-events: auto;
+  transform: translateY(100%);
+  transition:
+    transform var(--dur-sheet) var(--ease-out),
+    height var(--dur-sheet) var(--ease-out);
+}
+
+.layer:not(.closed) .sheet {
+  transform: translateY(0);
+}
+
+.sheet[data-detent='peek'] {
+  height: 112px;
+}
+
+.sheet[data-detent='half'] {
+  height: 46dvh;
+}
+
+.sheet[data-detent='full'] {
+  height: calc(100dvh - var(--bottom-nav, 0px));
+}
+
+/*
+ * 桌面：模态抽屉收成居中面板。桌面不是主要设计基准，但整屏表单会让
+ * 附近、预算这类短内容铺满 1440px，读起来像网页。
+ */
+@media (min-width: 1024px) {
+  .layer.modal {
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+  }
+
+  /*
+   * 尺寸按包含块算而不是按视口：探索页桌面的抽屉栏只有 480px，
+   * 用 100vw 会让 560px 的面板左右各溢出一截。layer 自带 24px 内边距，
+   * 所以 100% 已经是栏内可用的宽度。
+   */
+  .layer.modal .sheet {
+    width: min(560px, 100%);
+    height: min(720px, 100%);
+    border-radius: var(--radius-sheet);
+    box-shadow: var(--shadow-modal);
+  }
+
+  .layer.modal .sheet[data-detent='peek'],
+  .layer.modal .sheet[data-detent='half'],
+  .layer.modal .sheet[data-detent='full'] {
+    height: min(720px, 100%);
+  }
+}
+
+/* 手机上全面展开时把状态栏和 8px 呼吸位让出来：把手、16px 顶部圆角都在安全区内。 */
+@media (max-width: 1023px) {
+  .sheet[data-detent='full'] {
+    height: calc(
+      100dvh - var(--bottom-nav, 0px) - env(safe-area-inset-top, 0px) - 8px
+    );
+  }
+}
+
+.layer.closed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.layer.closed .backdrop {
+  opacity: 0;
+}
+
+.handleRow {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+  align-items: center;
+  flex: none;
+}
+
+.grabber {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.grabber:active {
+  cursor: grabbing;
+}
+
+.bar {
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-rule);
+}
+
+.close {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: none;
+}
+
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+/* 有固定操作栏时，底部留白交给 footer，滚动区不再重复叠加安全区。 */
+.content.withFooter {
+  padding-bottom: var(--space-3);
+}
+
+/* 固定操作栏：不随内容滚动，底部按安全区留白。 */
+.footer {
+  flex: none;
+  padding: var(--space-3) var(--space-5) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  border-top: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-paper);
+}
+
+/* 拖拽中锁住内容滚动，避免手指带着列表一起跑。 */
+.locked {
+  overflow-y: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .backdrop,
+  .sheet {
+    transition-duration: 0ms;
+  }
+}

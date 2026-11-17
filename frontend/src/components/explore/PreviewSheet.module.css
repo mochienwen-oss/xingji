@@ -1,0 +1,130 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.summary {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.notice {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dayTitle {
+  margin: 0;
+  padding-bottom: 0.375rem;
+  border-bottom: var(--rule-hair) solid var(--color-ink);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.stops {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stop {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+.stop:last-child {
+  border-bottom: 0;
+}
+
+.stopIndex {
+  padding-top: 0.125rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.stopBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.stopName {
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.stopMeta {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.dayEmpty {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.error {
+  margin: 0.5rem 0 0;
+  padding: 0.625rem 0.75rem;
+  border: var(--rule-hair) solid var(--color-danger);
+  border-radius: var(--radius-card);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background: var(--color-paper);
+}

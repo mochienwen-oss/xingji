@@ -1,0 +1,182 @@
+.page {
+  width: 100%;
+  /* 桌面把列表收在 1120px 内居中，避免卡片和三段式标签在宽屏上拉扯变形。 */
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+  color: var(--color-ink);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.heading {
+  min-width: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 6vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.intro {
+  margin: var(--space-2) 0 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.bin {
+  flex: none;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.segmented {
+  margin-top: var(--space-5);
+}
+
+.body {
+  margin-top: var(--space-5);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6) var(--space-4);
+}
+
+.plazaGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+.filterEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-5) 0;
+  color: var(--color-muted);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+.filterEmpty p {
+  margin: 0;
+}
+
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.skeletonCover {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto;
+}
+
+.skeletonTitle {
+  width: 70%;
+  height: 20px;
+}
+
+.skeletonMeta {
+  width: 45%;
+  height: 12px;
+}
+
+.auth {
+  padding: var(--space-6) var(--space-4) var(--space-5);
+  border-top: var(--rule-hair) solid var(--color-ink);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+}
+
+.authKicker {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+}
+
+.authTitle {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.authBody {
+  max-width: 34ch;
+  margin: var(--space-3) 0 var(--space-4);
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+.dialogNote {
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-inline: var(--space-6);
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    padding-inline: var(--space-8);
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .plazaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

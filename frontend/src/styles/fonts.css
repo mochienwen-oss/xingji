@@ -1,0 +1,16 @@
+/* Noto Serif SC (OFL) 自托管子集：GB2312 一级常用字 + 符号 + Latin。 */
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/NotoSerifSC-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/NotoSerifSC-Bold.woff2") format("woff2");
+}

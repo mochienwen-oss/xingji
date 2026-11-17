@@ -1,0 +1,79 @@
+/* 登录 / 注册：手机上不超过 88dvh，桌面收窄到 420px。 */
+.dialog {
+  max-height: min(88dvh, calc(100dvh - 56px - var(--kb-inset)));
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.forgot {
+  align-self: flex-end;
+  min-height: 44px;
+  margin-top: calc(-1 * var(--space-2));
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--color-ink-2);
+  font: 500 var(--text-sm) / 1.4 var(--font-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.forgot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.form a {
+  color: var(--color-ink-2);
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.fieldError {
+  margin-top: calc(-1 * var(--space-2));
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.formError {
+  padding: var(--space-3);
+  border-left: 2px solid var(--color-danger);
+  background: var(--color-paper-2);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.actions {
+  display: flex;
+  width: 100%;
+}
+
+.submit {
+  width: 100%;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 768px) {
+  .dialog {
+    width: 420px;
+    max-width: calc(100vw - 2 * var(--space-5));
+  }
+}

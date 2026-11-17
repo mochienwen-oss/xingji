@@ -1,0 +1,107 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 92%;
+}
+
+.assistant {
+  align-self: flex-start;
+}
+
+.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.label {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+.bubble {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.user .bubble {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-accent-ink);
+}
+
+.typing {
+  color: var(--color-muted);
+  animation: breathe 1.6s var(--ease-out) infinite;
+}
+
+/* 助手已经说了第一句、还在检索/排路线时，单独给一行进度，避免几十秒没有反馈。 */
+.statusLine {
+  margin: 0;
+  padding-left: 0.75rem;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  animation: breathe 1.6s var(--ease-out) infinite;
+}
+
+/* 生成中的唯一出口：不抢状态行的视觉重心，但必须可点、可聚焦。 */
+.cancel {
+  align-self: flex-start;
+  margin: 0 0 0 0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cancel:hover {
+  color: var(--color-ink);
+}
+
+.empty {
+  margin: 0;
+  padding: 0.875rem;
+  border: var(--rule-hair) dashed var(--color-ink-rule);
+  border-radius: var(--radius-card);
+  color: var(--color-muted);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing,
+  .statusLine {
+    animation: none;
+  }
+}

@@ -1,0 +1,169 @@
+.shell {
+  --bottom-nav: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 常驻页面容器：离开路由时只隐藏，不卸载组件。 */
+.keepAlive {
+  min-width: 0;
+}
+
+/* 路由切换后焦点落到主区域，但不显示焦点框。 */
+.main:focus {
+  outline: none;
+}
+
+.withNav {
+  --bottom-nav: calc(56px + env(safe-area-inset-bottom));
+}
+
+.withNav .main {
+  padding-bottom: var(--bottom-nav);
+}
+
+/* 懒加载页面的占位：保持主区域高度，避免路由切换时页面塌缩。 */
+.routeLoading {
+  display: grid;
+  min-height: 60dvh;
+  margin: 0;
+  place-items: center;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.loading {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.loading span {
+  margin: 0 8px;
+  color: var(--color-accent);
+}
+
+.connectivity {
+  position: fixed;
+  inset: 0 0 auto;
+  /* 要盖过页面自己的 sticky 顶栏（z-index 30）与移动端筛选条（z 20-40），
+     但低于分享遮罩 120 / Dialog 130：离线提示是全局状态，不能被页面头挡住。 */
+  z-index: 70;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.offline {
+  background: var(--color-ink);
+  color: var(--color-accent-ink);
+}
+
+.online {
+  background: var(--color-success);
+  color: var(--color-accent-ink);
+}
+
+.invitePage,
+.notFound {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100% - 40px, 520px);
+  margin: 0 auto;
+  padding: 96px 0;
+}
+
+.invitePage h1,
+.notFound h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 9vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+}
+
+.invitePage p,
+.notFound p {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.kicker {
+  color: var(--color-accent) !important;
+  font-family: var(--font-mono, var(--font-body));
+  font-size: 11px !important;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.primary,
+.secondary {
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--radius-card);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.primary {
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.secondary {
+  border: 1px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.error {
+  color: var(--color-danger) !important;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 1024px) {
+  .withNav {
+    --bottom-nav: 0px;
+  }
+
+  .withNav .main {
+    padding-top: var(--top-nav-height);
+    padding-bottom: 0;
+  }
+
+  .connectivity {
+    top: var(--top-nav-height);
+  }
+}

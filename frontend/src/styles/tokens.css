@@ -1,0 +1,71 @@
+:root {
+  /* D3 公路电影：暖纸、近黑油墨、砖红路线、靛蓝批注。 */
+  --color-paper: #F6F2EA;
+  --color-paper-2: #EFE7D9;
+  --color-paper-3: #FFFCF5;
+  --color-ink: #17120E;
+  --color-ink-2: #4A4038;
+  --color-muted: #6B6259;
+  --color-rule: #D8CDBC;
+  --color-ink-rule: #B9AB97;
+  --color-accent: #A8342A;
+  --color-accent-ink: #FFF9F0;
+  --color-accent-2: #E3D5BF;
+  --color-indigo: #1D3557;
+  --color-success: #2F6B4F;
+  --color-warning: #B7791F;
+  /* 琥珀文字色：在纸色底上比 --color-warning 对比度更高，用于“待核实”标签。 */
+  --color-warning-ink: #8A5A12;
+  --color-danger: #8C2F24;
+  --color-scrim: #17120E;
+  --color-map-wash: #F6F2EA;
+
+  /* 未迁移页面的琥珀语义：并入新语义色，逐页迁移后可删 */
+  --color-amber-wash: var(--color-paper-2);
+  --color-amber-ink: var(--color-danger);
+  --halo-live: #A8342A2B;
+
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --radius-card: 4px;
+  --radius-sheet: 16px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
+  --rule-bar: 1px;
+  --shadow-card: none;
+  --shadow-modal: 0 24px 64px rgba(23, 18, 14, .18), 0 2px 8px rgba(23, 18, 14, .08);
+  --track-display: 0;
+  /* 桌面顶部导航高度：AppShell 的让位、TopNav 本体与探索页左栏共用。 */
+  --top-nav-height: 64px;
+
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --text-xs: .75rem;
+  --text-sm: .8125rem;
+  --text-base: .9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-sheet: 320ms;
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --ease-step: ease;
+  --kb-inset: 0px;
+
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  font-synthesis: none;
+  color-scheme: light;
+}

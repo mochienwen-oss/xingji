@@ -1,0 +1,210 @@
+/* 分享行程面板：从页头绝对定位改为 portal 模态。
+   移动端底部抽屉，桌面居中卡片；内容区沿用 social.css 的 share-section。 */
+
+.share-backdrop {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-scrim) 42%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: share-backdrop-in 180ms ease-out both;
+}
+
+.share-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: min(88svh, 760px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 20px calc(24px + env(safe-area-inset-bottom));
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--color-paper-3);
+  box-shadow: 0 -20px 60px color-mix(in srgb, var(--color-scrim) 22%, transparent);
+  color: var(--color-ink);
+  text-align: left;
+  animation: share-sheet-in 280ms cubic-bezier(.22, .8, .3, 1) both;
+}
+
+.share-dialog:focus { outline: none; }
+
+.share-dialog-head {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 -20px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-paper-3);
+}
+
+.share-dialog .share-dialog-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+}
+
+/* 关闭键：44×44 图标按钮，方形圆角，避免“红描边胶囊”的观感。 */
+.share-dialog-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.share-dialog-close svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.share-dialog-close:hover { background: var(--color-paper-2); }
+.share-dialog-close:focus-visible { outline: 2px solid var(--color-ink-2); outline-offset: 2px; }
+
+.share-dialog h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+}
+
+.share-dialog p,
+.share-dialog small {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.share-dialog .share-section { margin-top: var(--space-4); }
+.share-dialog .share-section:first-of-type { margin-top: var(--space-4); }
+
+/* 三级可见性：分段控件下方留出说明文字间距，避免贴住发丝线。 */
+.share-dialog .share-visibility { margin-top: var(--space-2); }
+
+/* 面板里的控件统一到 44 触控高度、4px 圆角：.text-btn 没有基础样式，会露出浏览器默认边框。 */
+.share-dialog .share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.share-dialog .share-actions .secondary,
+.share-dialog .share-invite button {
+  border-radius: var(--radius-card);
+}
+
+.share-dialog .text-btn {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.share-dialog .text-btn:hover {
+  border-color: var(--color-ink-rule);
+  background: var(--color-paper-2);
+}
+
+.share-dialog .text-btn:focus-visible,
+.share-dialog .secondary:focus-visible,
+.share-dialog .share-invite button:focus-visible,
+.share-dialog .share-member-remove:focus-visible {
+  outline: 2px solid var(--color-ink-2);
+  outline-offset: 2px;
+}
+
+.share-dialog .share-invite input {
+  height: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-card);
+}
+
+.share-dialog .share-link-text { height: 44px; }
+
+.share-dialog .share-member-remove {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+@keyframes share-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes share-sheet-in {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (min-width: 781px) {
+  .share-backdrop { align-items: center; padding: 28px; }
+  .share-dialog {
+    width: min(92vw, 540px);
+    max-height: min(84vh, 720px);
+    padding: 0 24px 24px;
+    border-radius: var(--radius-sheet);
+    box-shadow: 0 24px 70px color-mix(in srgb, var(--color-scrim) 24%, transparent);
+    animation: share-dialog-in 220ms cubic-bezier(.22, .8, .3, 1) both;
+  }
+  .share-dialog-head { margin: 0 -24px; padding: 18px 24px 13px; }
+}
+
+@keyframes share-dialog-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* 行程头触发键：桌面保留文字，窄屏只留图标，把宽度还给被截断的标题。 */
+.share-area > .share-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+}
+.share-trigger svg { flex: none; width: 1rem; height: 1rem; }
+
+@media (max-width: 599px) {
+  .share-area > .share-trigger {
+    width: 44px;
+    padding: 0;
+  }
+  .share-trigger span { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-backdrop,
+  .share-dialog { animation: none; }
+}
+
+html[data-motion="reduce"] .share-backdrop,
+html[data-motion="reduce"] .share-dialog { animation: none; }

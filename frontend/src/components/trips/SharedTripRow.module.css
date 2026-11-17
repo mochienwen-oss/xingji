@@ -1,0 +1,119 @@
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) 0;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.badge {
+  flex: none;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  white-space: nowrap;
+}
+
+.arrow {
+  flex: none;
+  color: var(--color-muted);
+}
+
+.hit {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.row:hover .title,
+.row:focus-within .title {
+  color: var(--color-accent);
+}
+
+.presence {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--color-success);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+/* 行内覆盖层 .hit 铺满整行，退出按钮要浮在它上面才点得到。 */
+.leave {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-size: .8125rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.leave:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.leave:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+.leave:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

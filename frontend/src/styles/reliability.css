@@ -1,0 +1,65 @@
+/* 可靠性层：离线提示、生成停止、焦点与滚动辅助。
+   只复用 tokens.css 的令牌，不新增色板、渐变或发光。 */
+
+/* ── 生成中：停止 ─────────────────────────────────────── */
+.chat-stop-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 var(--space-4) var(--space-2);
+}
+.chat-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: var(--rule-hair) solid var(--color-ink-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: background-color var(--dur-fast) var(--ease-step), color var(--dur-fast) var(--ease-step), border-color var(--dur-fast) var(--ease-step);
+}
+.chat-stop::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--color-amber-ink);
+}
+.chat-stop:hover {
+  border-color: var(--color-ink);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+/* ── 已停止 · 重新生成 ────────────────────────────────── */
+.chat-stopped {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) var(--space-4) 0;
+  padding: var(--space-2) var(--space-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+.chat-stopped button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.chat-stopped button:hover { color: var(--color-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-stop { transition: none; }
+}

@@ -1,0 +1,58 @@
+.explore-map { width: 100%; height: 100%; }
+
+.brand-mark {
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border: 0; border-radius: 11px;
+  background: var(--color-accent); color: var(--color-paper-3);
+  font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg); line-height: 1;
+}
+
+.explore-chat-title h2 { margin-top: var(--space-2); font-size: var(--text-lg); }
+
+
+/* 页面内对话 */
+.explore-chat-title { display: flex; justify-content: space-between; align-items: flex-end; margin: var(--space-5) 0 var(--space-3); }
+.home-chat { padding: var(--space-4); border: var(--rule-hair) solid #e1e8de; border-radius: 14px; background: #f6f8f3; }
+.home-chat .travel-messages { min-height: 0; max-height: 260px; padding: var(--space-3) 0; }
+.home-chat.is-collapsed .travel-messages { display: none; }
+.home-chat .travel-input { padding: 0; border: 0; background: transparent; }
+.home-chat .travel-input textarea { min-height: 40px; resize: none; border: 0; background: transparent; box-shadow: none; }
+.home-chat .travel-input > div { margin-top: 2px; }
+.home-chat .travel-input span { display: none; }
+.home-chat .travel-input button { margin-left: auto; }
+.home-chat .planning-actions { margin-top: var(--space-3); font-size: var(--text-xs); }
+.home-chat .planning-actions .secondary { min-height: 36px; padding: 0 var(--space-3); }
+
+
+
+/* 窄屏：地图收在上半屏，抽屉变底部贴片 */
+@media (max-width: 800px) {
+
+  .home-chat .planning-actions { flex-direction: row; align-items: center; }
+  .home-chat .planning-actions button { width: auto; }
+
+}
+
+
+
+
+
+/* 同一地图上的行程与探索 */
+.brand-mark svg { width: 29px; height: 29px; display: block; }
+
+
+
+
+
+
+
+
+
+
+
+/* 窄屏：底部常驻的 AI 输入区收成单行「输入 + 发送 + 生成行程」 */
+@media (max-width: 800px) {
+
+  .explore-chat-title { display: none; }
+
+}

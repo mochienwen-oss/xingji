@@ -1,0 +1,112 @@
+/* 模态：手机上贴底，桌面 480px 居中；高度按 dvh 与键盘遮挡计算。
+ * z-index 130：必须压过分享面板的 share-backdrop(120)，否则「设为私密」的
+ * 确认弹窗会被分享面板盖住、点不到（同时仍低于地点详情 1001 / 预览层 1000）。 */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-scrim);
+  opacity: 0.32;
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100dvh - 56px - var(--kb-inset));
+  margin-bottom: var(--kb-inset);
+  padding: var(--space-5) var(--space-5) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--color-paper);
+  box-shadow: 0 -1px 0 var(--color-rule);
+  animation: panel-in var(--dur-base) var(--ease-out);
+}
+
+.panel:focus-visible {
+  /* 面板本身只是焦点容器，不画整圈描边。 */
+  outline: none;
+}
+
+.title {
+  padding-right: var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: var(--space-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  line-height: 1.65;
+}
+
+.prose {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  line-height: 1.65;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .layer {
+    align-items: center;
+    padding: var(--space-5);
+  }
+
+  .panel {
+    width: 480px;
+    max-width: 100%;
+    max-height: calc(100dvh - var(--space-7) - var(--kb-inset));
+    margin-bottom: 0;
+    padding-bottom: var(--space-5);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-sheet);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}

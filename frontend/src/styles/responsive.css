@@ -1,0 +1,25 @@
+@media (max-width: 800px) {
+  .topbar { height: 64px; padding: 0 20px; }
+  .shell { padding: 0 20px; }
+
+  .itinerary { width: 100%; }
+  .map-wrap { height: 280px; }
+  .day-tabs { padding: 0 20px; gap: 20px; }
+
+  .stops { padding-right: 20px; padding-left: 20px; }
+  .stops::before { left: 35px; }
+  .disclaimer { margin: 12px 20px 24px; }
+
+  .guide-import { padding: 0 20px 20px; }
+  .nearby { padding: 0 20px 20px; }
+
+  .guide-result { grid-template-columns: 1fr; }
+
+  footer { margin: 48px 20px 0; }
+}
+@media (max-width: 480px) {
+
+  .stop { gap: 8px; }
+  .stop-thumbnail { flex-basis: 48px; width: 48px; height: 48px; }
+
+}

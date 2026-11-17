@@ -1,0 +1,119 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  border-radius: var(--radius-card);
+}
+
+.media,
+.text {
+  min-width: 0;
+}
+
+.media {
+  position: relative;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.meta {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* 举报按钮必须盖在整卡点击层之上：z-index 2 且不能嵌进 .hit。 */
+.report {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  min-height: 28px;
+  padding: 2px var(--space-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-paper-3) 92%, transparent);
+  color: var(--color-ink-2);
+  font: 500 var(--text-xs)/1.4 var(--font-body);
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+/* 视觉 28px，热区补足 44px。 */
+.report::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.report:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.report:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.card:hover .title,
+.card:focus-within .title {
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title {
+    transition: none;
+  }
+}
