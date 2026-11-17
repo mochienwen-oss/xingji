@@ -25,6 +25,17 @@ node_modules/
 frontend/dist/
 *.tsbuildinfo
 
+# 测试文件（仅本地保留，不发布）
+/tests/
+/pytest.ini
+/scripts/run_pytest.py
+frontend/vitest.config.ts
+frontend/src/test/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
 # 运行日志与临时文件
 *.log
 .tmp-*

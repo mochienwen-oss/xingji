@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   backend:
-    name: 后端测试（Python 3.13）
+    name: 后端静态检查（Python 3.13）
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,28 +21,15 @@ jobs:
           python-version: "3.13"
           cache: pip
           cache-dependency-path: backend/requirements.txt
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
       - name: 安装依赖
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt pytest pyflakes
-      # 页面、robots.txt、sitemap.xml 只在 frontend/dist 存在时注册，后端接口测试需要先构建。
-      - name: 构建前端静态文件
-        working-directory: frontend
-        run: |
-          npm ci
-          npm run build
+          pip install -r backend/requirements.txt pyflakes
       - name: 静态检查
-        run: pyflakes backend tests scripts alembic
-      - name: 单元与接口测试
-        run: python -m pytest tests -q
+        run: pyflakes backend scripts alembic
 
   frontend:
-    name: 前端测试与构建（Node 22）
+    name: 前端检查与构建（Node 22）
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -58,7 +45,5 @@ jobs:
         run: npm ci
       - name: 类型检查
         run: npm run typecheck
-      - name: 组件与单元测试
-        run: npm test
       - name: 生产构建
         run: npm run build

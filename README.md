@@ -97,7 +97,7 @@
 | 层级 | 技术 |
 | --- | --- |
 | 后端 | FastAPI、SQLAlchemy 2、LangGraph、langchain-openai、httpx、Alembic、psycopg3 |
-| 前端 | React 19、Vite 6、TypeScript、dnd-kit；Vitest + jsdom |
+| 前端 | React 19、Vite 6、TypeScript、dnd-kit |
 | 数据 | 本地 SQLite（WAL）；生产 PostgreSQL 16；Redis 可选，用于跨 worker 的限流、匿名配额和实时在线名单 |
 | 外部服务 | 高德开放平台（地点、详情、路线、地图）；OpenAI 兼容模型服务 |
 
@@ -287,27 +287,11 @@ frontend/src/
   lib/          接口工具
   types/        共享类型
   styles/       样式
-tests/          按接口、地图和规划职责组织的测试
 alembic/        数据库迁移
 scripts/        本地运行、预检与运维脚本
 ```
 
 开发约定见 [AGENTS.md](AGENTS.md)。
-
-## 测试
-
-```bash
-python -m pytest tests -q
-
-cd frontend
-npm run typecheck
-npm test
-npm run build
-```
-
-仓库根目录的 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 push/PR 时执行同一组检查（后端 `pyflakes` + `pytest`，前端 `typecheck` + `test` + `build`），可作为合并前的门禁。
-
-自动化测试使用替代的第三方服务数据，并不能证明真实 API Key 可用、地图数据完整或行程适合实际出行。
 
 ## 部署
 
