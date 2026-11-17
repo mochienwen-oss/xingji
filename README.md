@@ -1,91 +1,80 @@
-# 行迹 · AI 旅游行程规划
+# 行迹 · XINGJI
 
-移动优先的 AI 旅行规划 Web App：用对话或表单说出城市、天数、同行人、兴趣、节奏和交通方式，行迹调用高德地点与路线，把真实候选地点排成 1–5 天行程；生成后可以编辑、保存、地图查看、分享、协作，并记录预算与花费。
+**把一段旅行想法，变成一条可执行、可分享的路线。**
 
-- 地点、路线、开放时间来自高德开放平台；模型只负责在已核实的高德候选地点中筛选和排程，不编造地点。
-- 本地开发默认 SQLite，生产使用 PostgreSQL 16。
-- 项目不提供预订，也不抓取第三方攻略；攻略整理、分享和广场内容都来自用户主动输入或公开的数据。
+行迹是一个移动优先的 AI 旅行规划 Web App。用对话或表单说出城市、天数、同行人、兴趣、节奏和交通方式，它会结合高德的地点、开放时间与路线，在真实候选地点中排出 1–5 天行程；生成后可以继续编辑、查看地图、记录预算、分享给朋友，或邀请同行人一起修改。
 
-## 1. 项目解决什么问题
+- **地点有依据**：模型只在高德检索到的候选地点中筛选和排程，不编造地点；路线也通过高德实际查询，查询不到时显示未知，不用直线距离冒充路线。
+- **结果可修改**：AI 生成只是起点，行程可以逐站拖动、调整时间并持久化保存，不是一段无法执行的文字。
+- **分享有边界**：只读分享页不暴露对话、预算和待规划池；公开广场也只展示脱敏摘要。
+- **本地轻量、生产可扩展**：本地开发默认 SQLite，生产使用 PostgreSQL 16，可按需接入 Redis。
 
-一次旅行规划通常要在攻略、地图、备忘录和聊天群之间来回切换：
+[![CI](https://github.com/mochienwen-oss/xingji/actions/workflows/ci.yml/badge.svg)](https://github.com/mochienwen-oss/xingji/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?logo=node.js&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 
-- **信息散**：景点、餐厅、开放时间、交通耗时分别散落在不同应用里。
+## 界面预览
+
+<p align="center">
+  <img src="assets/screenshots/trip-desktop.png" alt="行迹行程工作台：地图路线与按天行程" width="100%">
+</p>
+
+| 探索与 AI 规划 | 移动端行程 | 只读分享 |
+| :---: | :---: | :---: |
+| <img src="assets/screenshots/explore-mobile.png" alt="探索与 AI 规划" width="240"> | <img src="assets/screenshots/trip-mobile.png" alt="移动端行程" width="240"> | <img src="assets/screenshots/share-mobile.png" alt="只读分享" width="240"> |
+
+## 为什么做行迹
+
+一次旅行规划，通常要在攻略、地图、备忘录和聊天群之间来回切换：
+
+- **信息散**：景点、餐厅、开放时间和交通耗时分别散落在不同应用里。
 - **排程难**：一天能去几个地方、顺序是否顺路、每段要多久，需要反复估算。
 - **协作乱**：同行人改一版、自己改一版，最后不知道哪份是最新的。
 - **预算事后才算**：行程确定后才发现交通和门票超支。
 
-行迹把这条链路收进一个应用：
+行迹把这条链路收进一个应用：说需求、生成行程、逐站修改、看地图和路线、记录花费、分享或协作，都在同一份行程里完成。
 
-1. 用自然语言或表单说出需求，AI 把条件整理成结构化旅行需求。
-2. 在高德真实地点中挑选候选并排成每天行程，生成后先给预览。
-3. 在行程工作台里拖动顺序、调整停留时间、设置固定时间、核对地图和路线。
-4. 保存后分享只读链接，或用 8 位分享码邀请朋友一起编辑。
-5. 把行程公开到灵感广场，别人可以复制一份作为起点。
-6. 在同一个行程里记录总预算和每笔花费，也可以让 AI 估算。
+## 主要功能
 
-和普通聊天式规划的区别：
-
-- **地点有依据**：模型只能使用高德检索到的候选地点，路线也通过高德实际查询；查询不到时显示未知，不用直线距离冒充路线。
-- **结果可修改**：AI 生成只是起点，行程可以逐站编辑并持久化保存，不是一段无法执行的文字。
-- **分享有边界**：只读分享页不暴露对话、预算和待规划池；公开广场也只展示脱敏摘要。
-- **适合多人**：朋友可以用分享码加入协作，页面显示在线成员并同步保存版本。
-
-## 2. 主要功能
-
-### 2.1 AI 行程规划与需求对话
+### AI 行程规划
 
 - 支持**对话输入**和**表单输入**。对话会识别目的地、天数、同行人数、兴趣、节奏、预算、必去地点和交通方式，并回填到表单，确认后再生成。
 - 行程天数 **1–5 天**，同行人数 **1–20 人**，节奏为**轻松 / 适中 / 紧凑**，交通方式为**步行 / 驾车 / 公交**。
-- 生成前会先检索高德候选地点：必去地点最多 5 个、兴趣关键词最多 3 个，再补充“景点 / 公园 / 博物馆”等通用检索；地点不足或全部不在目标城市时会明确报错，不会拿其他城市的地点凑数。
-- 模型只从候选地点中选择，并按天、按停留时长排程；生成后会查询相邻地点之间的高德路线。
-- 如果一天的地点跨度过大或某段交通耗时过长，预览会带 `place_notice` 提示，建议核对后调整。
+- 生成前先检索高德候选地点：优先核实必去地点和兴趣关键词，再补充景点、公园、博物馆等通用检索；地点不足或全部不在目标城市时会明确报错。
+- 模型只从候选地点中选择，并按天、按停留时长排程；生成后查询相邻地点之间的高德路线。某天跨度过大或交通耗时过长时，预览会给出提示。
 - **未登录可以预览**，但受匿名日配额限制；登录后才能保存到“我的行程”。
 
-表单字段与限制：
+### 行程编辑
 
-| 字段 | 说明 |
-| --- | --- |
-| 目的地 `city` | 必填，最多 40 字；建议使用中文城市名 |
-| 天数 `days` | 1–5 天 |
-| 出发日期 `start_date` | 可空；保存后可继续调整 |
-| 同行人数 `travelers` | 1–20，默认 2 |
-| 兴趣 `interests` | 最多 200 字，逗号分隔 |
-| 节奏 `pace` | 轻松 / 适中 / 紧凑，默认适中 |
-| 预算 `budget` | 最多 100 字的偏好描述，用于排程参考，不是报价 |
-| 必去地点 `must_visit` | 最多 200 字，逗号分隔；会优先核实并安排 |
-| 交通方式 `transport` | walking / driving / transit，默认 transit |
-
-### 2.2 行程编辑与时间安排
-
-- 行程工作台支持拖动调整地点顺序、修改停留时长（15–480 分钟）、删除地点，以及把地点放回“待规划池”。
+- 拖动调整地点顺序、修改停留时长（15–480 分钟）、删除地点，或把地点放回“待规划池”。
 - 每天可以设置开始时间和希望结束时间；结束时间早于或等于开始时间时按次日计算。
-- 可以为具体地点设置固定开始时间，并选择是否在次日；提前到达固定事项会计入等待，预计迟到会给出提示。
-- 修改后需要点击“保存修改”才持久化；保存使用版本号做并发校验，别人已经保存过时会提示冲突，未保存的修改仍留在当前页面。
-- AI 对话改稿先给出建议，应用后仍需保存；保存前可以撤销。
-- 支持粘贴攻略文字：可以只抽取地点并加入待规划池，也可以让 AI 按天整理成大纲，核对地点后一次采纳。
-- 行程删除是软删除，分享链接会立即不可访问；删除的行程进入回收站，可在 7 天内恢复。
+- 可以为地点设置固定开始时间，并选择是否在次日；提前到达会计入等待，预计迟到会给出提示。
+- 支持粘贴攻略文字：只抽取地点加入待规划池，或让 AI 按天整理成大纲，核对后一次采纳。
+- 修改后点击“保存修改”才持久化；保存使用版本号做并发校验，别人已经保存过时会提示冲突，未保存的修改仍留在页面。
+- 行程删除是软删除，分享链接立即不可访问；删除的行程进入回收站，可在 7 天内恢复。
 
-### 2.3 地图、路线与附近探索
+### 地图、路线与附近探索
 
-- 行程中的地点会显示在高德 JS 地图上，点击地点列表可以把地图定位到对应位置。
-- 每天的地点按顺序显示相邻路段，包含交通方式、预计耗时和高德返回的路线折线；地图服务暂时不可用时会保留已保存的地点信息并给出提示。
+- 地点显示在高德 JS 地图上，点击地点列表可以定位到对应位置。
+- 每天按顺序显示相邻路段，包含交通方式、预计耗时和高德返回的路线折线；地图服务暂时不可用时会保留已保存的地点信息并给出提示。
 - 可以按天重新计算路线；调整顺序或停留时间后，未变化的路段会复用之前的结果。
-- “附近探索”以已保存的行程地点为中心搜索餐厅、咖啡或景点，默认半径约 3 公里，可调整范围；搜索半径不代表步行距离或顺路程度。
+- “附近探索”以已保存的行程地点为中心搜索餐厅、咖啡或景点，默认半径约 3 公里，可调整范围。
 - “路线优化”会比较地图返回的交通耗时给出建议顺序，并避开与固定时间事项的冲突。
 
-### 2.4 分享、协作与灵感广场
+### 分享、协作与灵感广场
 
-- **只读分享链接**：行程所有者可以生成一个分享链接，也可以撤销该行程的全部链接；一个行程同时只有一个有效链接。
-- 分享落地页为 `/s/{token}`，可被抓取标题后跳回应用内的只读视图；链接失效、行程删除期间不可访问。
-- 分享页只展示已保存的地点、活动、时间和路线，**不包含对话、预算和待规划池**；打开分享页不需要登录。
+- **只读分享链接**：所有者可以生成分享链接，也可以撤销该行程的全部链接；一个行程同时只有一个有效链接。
+- 分享落地页为 `/s/{token}`，打开不需要登录；链接失效或行程删除期间不可访问。
+- 分享页只展示已保存的地点、活动、时间和路线，**不包含对话、预算和待规划池**。
 - **8 位分享码**：朋友在“我的行程”输入分享码后成为可编辑协作者；分享码可以停用或轮换，所有者也可以移除协作者（移除后旧分享码失效）。
 - 协作页面显示成员列表和当前在线人数，保存后其他人的页面会同步到新版本。
-- **三级可见性**：私密（收回公开状态和链接）、仅链接、公开。公开行程会出现在灵感广场。
-- 灵感广场匿名可读，展示最新 20 条公开行程的城市、标题、天数和作者；登录后可以复制一份到自己的行程，副本不包含原作者的 AI 对话。
+- **三级可见性**：私密、仅链接、公开。公开行程会出现在灵感广场，匿名可读；登录后可以复制一份到自己的行程，副本不包含原作者的 AI 对话。
 - 公开行程和分享页都支持举报；运营侧可通过管理员接口查看举报列表。
 
-### 2.5 预算与花费
+### 预算与花费
 
 - 创建者可以设置行程总预算；协作者也可以记录和编辑支出。
 - 支出包含金额、分类（餐饮 / 交通 / 住宿 / 门票 / 其他）、日期、可选地点和备注。
@@ -93,7 +82,7 @@
 - 支持让 AI 根据当前行程估算花费；估算结果只是参考，不是报价。
 - 预算和花费只在行程成员内可见，不进入只读分享页。
 
-### 2.6 账号、安全与运营能力
+### 账号、安全与运营能力
 
 - 注册要求用户名 2–80 字、密码 8–200 字，并同意服务条款；邮箱为选填。
 - 登录失败默认累计 10 次后锁定 15 分钟，锁定期间即使密码正确也拒绝登录（`LOGIN_MAX_FAILURES` / `LOGIN_LOCK_SECONDS` 可调）。
@@ -102,82 +91,60 @@
 - 账户设置里可以关闭“AI 记忆”；关闭后规划不再读取或写入长期偏好。
 - 匿名访问有每日配额：默认 LLM 30 次、高德 300 次，登录用户不占匿名配额；另有独立的接口限流。
 - 提供 `/api/health` 健康检查和 `/api/metrics` 只读观测快照；指标接口需要配置 `ADMIN_TOKEN` 并携带 `X-Admin-Token`。
-- FastAPI 自带的 `/docs` 在本地默认可用，便于查看和调试接口；生产环境如不需要，可在反向代理层限制访问。
 
-### 2.7 页面入口
+## 技术栈
 
-前端使用 hash 路由，构建后由 FastAPI 直接托管：
-
-| 地址 | 用途 |
+| 层级 | 技术 |
 | --- | --- |
-| `http://127.0.0.1:8000/#/` | 探索：对话或表单生成行程 |
-| `http://127.0.0.1:8000/#/trips?tab=mine` | 我的行程、输入分享码加入协作 |
-| `http://127.0.0.1:8000/#/trips?tab=plaza` | 灵感广场 |
-| `http://127.0.0.1:8000/#/collab` | 协同：我参与的行程 |
-| `http://127.0.0.1:8000/#/trips/{id}` | 行程工作台 |
-| `http://127.0.0.1:8000/#/profile` | 个人主页 |
-| `http://127.0.0.1:8000/#/settings/account` | 账户设置、AI 记忆、导出与注销 |
-| `http://127.0.0.1:8000/#/forgot` | 找回密码 |
-| `http://127.0.0.1:8000/#/terms`、`/#/privacy` | 服务条款与隐私政策 |
-| `http://127.0.0.1:8000/s/{token}` | 只读分享落地页 |
+| 后端 | FastAPI、SQLAlchemy 2、LangGraph、langchain-openai、httpx、Alembic、psycopg3 |
+| 前端 | React 19、Vite 6、TypeScript、dnd-kit；Vitest + jsdom |
+| 数据 | 本地 SQLite（WAL）；生产 PostgreSQL 16；Redis 可选，用于跨 worker 的限流、匿名配额和实时在线名单 |
+| 外部服务 | 高德开放平台（地点、详情、路线、地图）；OpenAI 兼容模型服务 |
 
-## 3. 技术架构与项目结构
+调用链：浏览器 → FastAPI → LangGraph 规划/改稿流程 → 高德地点与路线 / 模型服务 → 归一化后存为行程 JSON。
 
-- 后端：FastAPI、SQLAlchemy 2、LangGraph、langchain-openai、httpx、Alembic、psycopg3；可选 Redis。
-- 前端：React 19、Vite 6、TypeScript；行程时间线使用 dnd-kit 拖拽；测试使用 Vitest + jsdom。
-- 数据：本地 SQLite（WAL），生产 PostgreSQL 16；Redis 只用于跨 worker 的限流、匿名配额和实时在线名单。
-- 调用链：浏览器 → FastAPI → LangGraph 规划/改稿流程 → 高德地点与路线 / OpenAI 兼容模型；结果归一化后存为行程 JSON。
+## 安装
 
-```text
-backend/
-  api/          HTTP 接口：认证、规划、行程、分享、预算、举报、健康检查
-  services/     高德、模型、LangGraph 规划、路线优化、配额、分享快照
-  db.py         数据模型与会话
-  schemas.py    请求/响应类型
-frontend/src/
-  pages/        页面
-  components/   地图、时间线、预算、攻略导入等组件
-  lib/          接口工具
-  types/        共享类型
-tests/          按接口、地图和规划职责组织的测试
-```
-
-开发约定见 [AGENTS.md](AGENTS.md)。
-
-## 4. 安装方案
-
-### 4.1 环境要求
+### 环境要求
 
 - **Python 3.11 或更新版本**（CI 使用 Python 3.13）。
-- **Node.js 22.13+ 或 24+**（前端依赖的 engines 要求，见 `frontend/package.json`）。
-- **PostgreSQL 16**：生产/高并发环境需要；本地开发可不装，默认回退 SQLite。
-- **高德开放平台**：Web 服务 API Key、JS API Key、JS 安全密钥；按实际域名配置 JS Key 的安全域名，并确认账号权限、计费及地点数据使用许可。
+- **Node.js 22.13+ 或 24+**（见 `frontend/package.json` 的 engines）。
+- **PostgreSQL 16**：生产/高并发环境需要；本地开发可不装，默认使用 SQLite。
+- **高德开放平台**：Web 服务 Key、JS API Key、JS 安全密钥；按实际域名配置 JS Key 的安全域名。
 - **模型服务**：支持 OpenAI Chat Completions 接口的模型及 API Key，或 DeepSeek API Key；模型需要支持 JSON 输出。
 - 后端需要能访问高德和模型服务的网络。
 
-### 4.2 安装后端依赖
+### 1. 获取代码并安装后端依赖
 
-在项目根目录（包含 `backend/`、`frontend/` 的目录）执行：
+```bash
+git clone https://github.com/mochienwen-oss/xingji.git
+cd xingji
+python -m venv .venv
+```
+
+Windows PowerShell：
 
 ```powershell
-python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r backend/requirements.txt
 ```
 
-macOS / Linux 把激活命令换成：
+macOS / Linux：
 
 ```bash
 source .venv/bin/activate
+pip install -r backend/requirements.txt
 ```
 
-### 4.3 配置 .env
+### 2. 配置环境变量
 
 复制示例配置，填写密钥；不要提交或分享 `.env`：
 
 ```powershell
 Copy-Item .env.example .env
 ```
+
+macOS / Linux 使用 `cp .env.example .env`。
 
 至少需要填写：
 
@@ -186,77 +153,64 @@ Copy-Item .env.example .env
 | `AMAP_WEB_KEY` | 高德 Web 服务 Key，只在后端调用，用于地点搜索、详情和路线 |
 | `AMAP_JS_KEY` | 高德 JS API Key，会下发到浏览器，用于地图 |
 | `AMAP_JS_SECURITY_CODE` | 高德 JS 安全密钥，会下发到浏览器 |
-| `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` | 企业/自建 OpenAI 兼容网关；三者要么都填，要么清空 |
-| `DEEPSEEK_API_KEY` / `DEEPSEEK_MODEL` | 未使用企业网关时使用 |
+| `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` | OpenAI 兼容模型网关；三者要么都填，要么清空 |
+| `DEEPSEEK_API_KEY` / `DEEPSEEK_MODEL` | 未使用模型网关时使用 |
 | `SESSION_SECRET` | 会话签名密钥；生产必须设置至少 32 字节的随机值 |
 
 常用可选项：
 
-- `DATABASE_URL`：PostgreSQL 连接串；不填则使用 `trip.db`。
-- `APP_ENV`：`development` 或 `production`。
-- `APP_BASE_URL`：邮件链接前缀；生产填写 `https://` 域名，不带结尾斜杠。
-- `COOKIE_SECURE`：开发可为 `false`；生产使用 HTTPS 时必须为 `true`（或留空，由 `APP_BASE_URL` 的 https 推导，不要显式写 `false`）。
-- `SMTP_*`：邮箱验证和找回密码所需；不配置时服务仍可启动，但邮件不会发出。
-- `ADMIN_TOKEN`：举报列表和 `/api/metrics` 的管理令牌；不配置时这些端点返回 404。
-- `REDIS_URL`：需要多 worker 时配置，用于共享限流、匿名配额和在线名单。
-- `ANON_LLM_DAILY` / `ANON_AMAP_DAILY`：匿名日配额，设为 0 可关闭对应配额。
+| 变量 | 说明 |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL 连接串；不填则使用 `trip.db` |
+| `APP_ENV` | `development` 或 `production` |
+| `APP_BASE_URL` | 邮件和分享链接前缀；生产填写 `https://` 域名，不带结尾斜杠 |
+| `COOKIE_SECURE` | 开发可为 `false`；生产使用 HTTPS 时必须为 `true`，或留空由 `APP_BASE_URL` 的 https 推导 |
+| `REDIS_URL` | 需要多 worker 时配置，用于共享限流、匿名配额和在线名单 |
+| `SMTP_*` | 邮箱验证和找回密码所需；不配置时服务仍能启动，但邮件不会发出 |
+| `ADMIN_TOKEN` | 举报列表和 `/api/metrics` 的管理令牌；不配置时这些端点返回 404 |
+| `ANON_LLM_DAILY` / `ANON_AMAP_DAILY` | 匿名日配额，设为 0 可关闭对应配额 |
 
-生产（`APP_ENV=production`）会做启动校验：必须使用 PostgreSQL、必须提供 `SESSION_SECRET`、`APP_BASE_URL` 必须是 https 且不能是本机地址、`COOKIE_SECURE` 不能显式为 `false`。本地开发未设置 `SESSION_SECRET` 时，首次启动会生成仓库根 `.session-secret`（0600）复用；只有文件系统不可写才退回进程内随机密钥，那种情况下每次重启都需要重新登录。
+生产（`APP_ENV=production`）会做启动校验：必须使用 PostgreSQL、必须提供 `SESSION_SECRET`、`APP_BASE_URL` 必须是 https 且不能是本机地址、`COOKIE_SECURE` 不能显式为 `false`。本地开发未设置 `SESSION_SECRET` 时，首次启动会生成仓库根 `.session-secret`（0600）复用。
 
-#### 接入企业模型网关
+#### 接入模型网关
 
-如果企业网关提供兼容 OpenAI 的 `/v1/chat/completions` 接口，在 `.env` 中填写：
+如果模型网关提供兼容 OpenAI 的 `/v1/chat/completions` 接口，在 `.env` 中填写：
 
 ```dotenv
 LLM_BASE_URL=https://llm-gateway.example.com/v1
-LLM_API_KEY=在此填写完整的企业密钥
-LLM_MODEL=在此填写企业平台提供的准确模型名
+LLM_API_KEY=在此填写完整密钥
+LLM_MODEL=在此填写平台提供的准确模型名
 ```
 
-`LLM_BASE_URL` 是接口基础地址，不包含 `/chat/completions`；实际路径以企业平台文档为准。启用该配置时必须同时填写企业密钥和模型名，不会自动借用 DeepSeek 密钥。清空 `LLM_BASE_URL` 可继续使用 `DEEPSEEK_API_KEY` 和 `DEEPSEEK_MODEL`。修改 `.env` 后重启后端。
+`LLM_BASE_URL` 是接口基础地址，不包含 `/chat/completions`；实际路径以平台文档为准。启用该配置时必须同时填写密钥和模型名，不会自动借用 DeepSeek 密钥。清空 `LLM_BASE_URL` 可继续使用 `DEEPSEEK_API_KEY` 和 `DEEPSEEK_MODEL`。修改 `.env` 后重启后端。
 
-如企业网关支持标准模型列表接口，可在项目根目录查询可用模型名（不会显示密钥）；若接口被禁用，请向管理员询问模型 ID：
+网关还需支持请求中的 `response_format={"type":"json_object"}`。配置正确仍无法生成时，请核实模型权限、可用额度和 JSON 输出支持。
 
-```powershell
-python -c "from dotenv import load_dotenv; import os, httpx; load_dotenv('.env'); r=httpx.get(os.environ['LLM_BASE_URL'].rstrip('/')+'/models', headers={'Authorization':'Bearer '+os.environ['LLM_API_KEY']}, timeout=20); r.raise_for_status(); print('\n'.join(x['id'] for x in r.json()['data']))"
-```
+### 3. 初始化账号并启动
 
-网关还需支持请求中的 `response_format={"type":"json_object"}`。配置正确仍无法生成时，请向管理员核实模型权限、可用额度和 JSON 输出支持。地图服务也需要单独配置，才能生成实际行程。
+使用 SQLite 本地开发可以直接运行：
 
-### 4.4 初始化账号、构建前端并启动
-
-SQLite 本地开发（未配置 `DATABASE_URL`）可以直接运行：
-
-```powershell
+```bash
 python -m backend.create_user
 ```
 
-按提示输入用户名和密码（密码不会显示）；需要更多账号时重复执行，也可以直接在网页注册。使用 PostgreSQL 时，先完成下一节的迁移，再执行该命令。
+按提示输入用户名和密码（密码不会显示）；需要更多账号时重复执行，也可以直接在网页注册。使用 PostgreSQL 时先完成下一节的迁移，再执行该命令。
 
 构建前端并由后端托管：
 
-```powershell
+```bash
 cd frontend
-npm install
+npm ci
 npm run build
 cd ..
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-打开 `http://127.0.0.1:8000`。修改前端后重新运行 `npm run build`，并重启后端；没有构建产物时页面不可用。
+打开 <http://127.0.0.1:8000>。修改前端后重新运行 `npm run build` 并重启后端；没有构建产物时页面不可用。
 
-开发前端时可以另开一个终端：
+### 4. 使用 PostgreSQL
 
-```powershell
-cd frontend
-npm run dev
-```
-
-Vite 会把 `/api` 代理到本机 8000 端口，页面在 Vite 提供的地址打开；正式使用时仍建议构建后由 FastAPI 统一托管。
-
-### 4.5 使用 PostgreSQL（生产/高并发）
-
-PostgreSQL 的表结构只由 Alembic 管理，应用启动时不会自动建表；缺少迁移会给出可操作的报错。
+PostgreSQL 的表结构只由 Alembic 管理，应用启动时不会自动建表。
 
 ```powershell
 # 1. 准备 PostgreSQL 16 实例与账号（示例，按实际主机/密码替换）
@@ -265,244 +219,115 @@ psql -U postgres -c "CREATE ROLE trip LOGIN PASSWORD 'change-me';" -c "CREATE DA
 # 2. 让服务与迁移命令指向同一个库
 $env:DATABASE_URL='postgresql+psycopg://trip:change-me@127.0.0.1:5432/trip'
 python -m alembic upgrade head
-python -m alembic current   # 应显示 0009_cleanup_dead_schema (head)
 ```
 
-把 `DATABASE_URL` 写进 `.env` 后重启服务。`APP_ENV=production` 且仍使用 SQLite 时，服务会按设计拒绝启动。需要清空重建时，先运行 `python scripts/db_reset.py` 预览将删除的表，确认后加 `--yes`；生产环境默认拒绝，需额外加 `--force`。
+把 `DATABASE_URL` 写进 `.env` 后重启服务。`APP_ENV=production` 且仍使用 SQLite 时，服务会按设计拒绝启动。默认仍是单进程 Uvicorn；设置 `REDIS_URL` 后，限流、匿名日配额和实时协同在线名单会改由 Redis 共享，可以开多个 worker；未配置或 Redis 连接失败时自动回退到进程内实现。
 
-默认仍是单进程 Uvicorn；PostgreSQL 连接池默认 5+5（`DB_POOL_SIZE` / `DB_MAX_OVERFLOW` 可覆盖）。设置 `REDIS_URL` 后，限流、匿名日配额和实时协同在线名单会改由 Redis 共享，可以开多个 worker；未配置或 Redis 连接失败时自动回退到进程内实现，单进程行为不变。高德地点缓存、分享快照和模型并发闸门仍是进程内状态，多 worker 时各自一份，AI 队列也尚未引入。
+### 5. 前端开发模式
 
-### 4.6 生产部署要点
+后端保持在 8000 运行，另开一个终端：
 
-可在国内服务器上按上述方式安装，准备 PostgreSQL 16 并执行 `python -m alembic upgrade head`，构建前端后由 FastAPI 提供网页，再用 Nginx 反向代理到仅监听 `127.0.0.1:8000` 的服务，配置域名及 HTTPS；用系统服务管理器保持 Uvicorn 运行。
+```bash
+cd frontend
+npm run dev
+```
 
-- 设置 `APP_ENV=production`、`APP_BASE_URL=https://你的域名`、`SESSION_SECRET`（至少 32 字节随机值）、`COOKIE_SECURE=true`。
-- 配置高德 JS Key 的安全域名，并确认 Web 服务 Key 只出现在服务端。
-- 数据库、`.env` 和访问日志放在服务器受限目录；不要提交 `.env`、`trip.db` 或真实密钥。
-- 反向代理需正确传递 `X-Forwarded-Proto` / `Host`，并限制 `/docs`、`/api/metrics` 等调试/管理入口的访问范围。
-- 实际部署、域名、证书及服务商账号需要使用者自行提供。
+Vite 会把 `/api` 代理到本机 8000 端口，页面在 Vite 提供的地址打开。正式使用时仍建议构建后由 FastAPI 统一托管。
 
-## 5. 使用方法
+## 使用
 
-### 5.1 生成第一份行程
+### 生成第一份行程
 
 1. 打开首页，选择“对话”或“表单”。
 2. 对话可以直接说：“下周末去杭州玩两天，带父母，少走路，想去西湖和灵隐寺，预算 3000 左右。”页面会把识别出的城市、天数、人数、兴趣、预算和交通方式回填到表单，确认或修改后生成。
 3. 未登录也可以预览；预览会展示每天的站点、停留时长、推荐理由、相邻路段耗时和路线。若提示跨度过大或某段交通过长，可以调整地点或交通方式后重试。
 4. 登录后点击保存，行程进入“我的行程”，并分配真实行程 ID 和版本号。
 
-### 5.2 编辑与保存
+### 编辑与保存
 
-1. 在行程工作台拖动地点调整顺序，或修改停留时长；也可以把地点移入“待规划池”，之后再安排到某一天。
-2. 为每天设置开始/结束时间，为需要准时到达的地点设置固定时间；注意结束时间早于开始时间会按次日计算。
-3. 点击“保存修改”。如果页面提示版本冲突，说明别人已经保存过，重新打开/合并后再保存；当前未保存的修改不会立刻丢失。
-4. 在 AI 对话里提出修改（例如“第二天少走一点，把博物馆换到上午”），AI 会先给出建议；应用后再保存。
-5. 需要整理攻略时，打开“导入攻略”，粘贴正文：可以只抽取地点加入待规划，也可以生成按天大纲并采纳；采纳会整份更新行程，当前有未保存修改时需要先保存或放弃。
+- 在行程工作台拖动地点调整顺序，或修改停留时长；也可以把地点移入“待规划池”，之后再安排到某一天。
+- 为每天设置开始/结束时间，为需要准时到达的地点设置固定时间；结束时间早于开始时间会按次日计算。
+- 点击“保存修改”。如果提示版本冲突，说明别人已经保存过，重新打开/合并后再保存；当前未保存的修改不会立刻丢失。
+- 在 AI 对话里提出修改（例如“第二天少走一点，把博物馆换到上午”），AI 会先给出建议；应用后再保存。
+- 需要整理攻略时，打开“导入攻略”，粘贴正文：可以只抽取地点加入待规划，也可以生成按天大纲并采纳。
 
-### 5.3 地图、路线、附近与预算
+### 地图、附近与预算
 
 - 点击地点列表中的地点，可以在地图上定位；地图上会显示当天相邻地点的路线。
 - “附近”以当前地点为中心搜索餐厅、咖啡或景点，选中后加入行程。
 - “路线优化”会给出一版建议顺序；应用后仍需保存。
-- 打开“预算”，设置总预算并记录支出；也可以让 AI 估算。金额在页面上按“元”输入，接口内部按“分”保存。
+- 打开“预算”，设置总预算并记录支出；也可以让 AI 估算。金额在页面上按“元”输入。
 
-### 5.4 分享、协作与公开
+### 分享、协作与公开
 
 1. 行程所有者打开分享设置，生成只读链接；把链接发给朋友即可查看，不需要登录。撤销链接或删除行程后，旧链接立即失效。
 2. 需要一起编辑时，生成 8 位分享码；朋友在“我的行程”输入分享码后成为协作者。页面上会显示在线人数，保存后其他人会同步到新版本。
 3. 选择“公开”后，行程会出现在灵感广场；其他人登录后可以复制一份，副本不包含原作者的对话。
 4. 分享页和公开行程都提供举报入口；被移除的协作者无法再用旧分享码加入。
 
-### 5.5 账号与安全
+### 账号与安全
 
 - 在“我的”里登录/注册，或打开账户设置修改邮箱、密码、AI 记忆开关。
 - 忘记密码时使用“找回密码”；只有配置了 SMTP 才会真正发送邮件。
 - 账户设置支持导出 JSON（含行程、预算和 AI 记忆）以及注销账号；注销会永久删除账号、行程、协作与分享链接、预算和花费，无法恢复。
 - 生产环境务必使用 HTTPS 和 Secure Cookie；不要把 `.env`、数据库文件或密钥提交到仓库。
 
-### 5.6 使用中的行为与限制
-
-- **保存才生效**：拖动、修改时间、采纳攻略、路线优化等操作，只有在点击“保存修改”后才写入数据库并更新分享页。
-- **时间估算是参考**：页面根据停留时长和高德相邻交通耗时估算，不包含用餐、休息、排队和预约限制；缺少路段耗时时，后续时间显示待定。
-- **地点要核对**：地址、开放时间和价格以高德及官方信息为准；景点内部子地点重复安排无法完全自动识别。
-- **分享页有边界**：只读页不包含对话、预算、待规划池；私密行程不会出现在广场。
-- **匿名配额**：未登录的 AI 预览/对话和高德搜索有每日限额；触发后登录再试，或调整 `.env` 中的配额（0 表示关闭）。
-- **网络依赖**：AI 和高德需要后端能访问外网；上游超时或限流会显示可重试的错误。
-
-## 6. 输入输出演示
-
-以下为演示用示例，实际地点、顺序、耗时和文案由高德返回数据和模型生成结果决定。
-
-### 6.1 对话输入 → 行程预览
-
-**输入（对话）：**
-
-> 下周末去杭州玩两天，带父母，少走路，想去西湖和灵隐寺，预算 3000 左右，公交为主。
-
-**识别出的条件（示例）：**
-
-| 字段 | 值 |
-| --- | --- |
-| 城市 | 杭州 |
-| 天数 | 2 |
-| 同行人数 | 2 |
-| 兴趣 | 西湖、灵隐寺、杭帮菜 |
-| 节奏 | 轻松 |
-| 预算 | 3000 左右 |
-| 必去 | 西湖、灵隐寺 |
-| 交通 | transit（公交/地铁） |
-
-**输出（示例）：**
-
-- 第 1 天：西湖周边步行与游船 → 午餐 → 博物馆/湖滨休整；每段显示预计交通耗时。
-- 第 2 天：灵隐寺 → 周边景点 → 返回市区；固定时间地点会显示到达提示。
-- 未安排进日程的收藏地点进入“待规划池”；若某天跨度过大，预览顶部出现 `place_notice` 提示。
-- 登录保存后，行程出现在“我的行程”，可以继续编辑、分享或记录预算。
-
-### 6.2 HTTP API：生成预览
-
-预览接口不需要登录（受匿名配额限制）：
-
-```powershell
-$body = @{
-  city = '杭州'
-  days = 2
-  start_date = '2026-11-21'
-  travelers = 2
-  interests = '西湖,博物馆,杭帮菜'
-  pace = '适中'
-  budget = '3000'
-  must_visit = '灵隐寺'
-  transport = 'transit'
-  conversation = @(
-    @{ role = 'user'; content = '带父母，少走路，想吃杭帮菜' }
-  )
-} | ConvertTo-Json -Depth 6
-
-Invoke-RestMethod -Method Post `
-  -Uri 'http://127.0.0.1:8000/api/planning/preview' `
-  -ContentType 'application/json; charset=utf-8' `
-  -Body ([Text.Encoding]::UTF8.GetBytes($body))
-```
-
-响应节选（只展示第 1 天，实际天数与请求一致；地点和耗时为示例）：
-
-```json
-{
-  "id": 0,
-  "title": null,
-  "version": 0,
-  "is_owner": true,
-  "is_public": false,
-  "request": {
-    "city": "杭州",
-    "days": 2,
-    "start_date": "2026-11-21",
-    "travelers": 2,
-    "interests": "西湖,博物馆,杭帮菜",
-    "pace": "适中",
-    "budget": "3000",
-    "must_visit": "灵隐寺",
-    "transport": "transit"
-  },
-  "days": [
-    {
-      "stops": [
-        {
-          "place": {
-            "id": "B023B13L9M",
-            "name": "西湖风景名胜区",
-            "address": "",
-            "location": "120.130,30.240",
-            "city": "杭州市",
-            "opentime": "",
-            "cost": "",
-            "source_time": "2026-11-17T08:00:00Z",
-            "photos": [],
-            "unavailable": false
-          },
-          "duration": 150,
-          "reason": "上午沿湖步行，节奏轻松"
-        },
-        {
-          "place": {
-            "id": "B023B02842",
-            "name": "灵隐寺",
-            "address": "",
-            "location": "120.102,30.240",
-            "city": "杭州市",
-            "opentime": "",
-            "cost": "",
-            "source_time": "2026-11-17T08:00:00Z",
-            "photos": [],
-            "unavailable": false
-          },
-          "duration": 90,
-          "reason": "按必去地点安排，预留排队时间"
-        }
-      ],
-      "routes": [
-        {
-          "origin": "B023B13L9M",
-          "destination": "B023B02842",
-          "mode": "transit",
-          "duration": 1680,
-          "distance": null,
-          "polyline": [
-            [
-              [120.130, 30.240],
-              [120.120, 30.245],
-              [120.102, 30.240]
-            ]
-          ],
-          "source_time": "2026-11-17T08:00:00Z"
-        }
-      ]
-    }
-  ],
-  "backlog": [],
-  "conversation": [
-    {
-      "role": "user",
-      "content": "带父母，少走路，想吃杭帮菜"
-    }
-  ],
-  "created_at": "2026-11-17T08:00:00Z"
-}
-```
-
-字段说明：
-
-- `id=0` 表示这是未保存的预览；保存后返回真实 `id`，`version` 从 0 开始，每次保存递增。
-- `days[].stops[]` 是当天按顺序的站点；`duration` 单位为分钟，`place` 是高德地点详情，`reason` 是模型给出的安排理由。
-- `days[].routes[]` 是相邻站点之间的高德路线；`duration` 单位为秒，`polyline` 为经纬度点串。公交路线不返回总距离时 `distance` 为 `null`。
-- 预览可能带 `place_notice`，例如“第 1 天有一段交通预计约 28 分钟，建议核对后调整。”；这是提示，不是生成失败。
-- 常见错误：城市为空/地点不足/候选地点全部不在目标城市返回 422；高德或模型上游不可用返回 503；匿名配额或限流触发返回 429。
-
-### 6.3 保存与分享
-
-登录后，网页会把预览保存为真实行程，并生成可访问的分享链接：
+## 项目结构
 
 ```text
-POST /api/trips/from-preview   -> 201 { "id": 12, "version": 0, ... }
-POST /api/trips/12/share       -> { "token": "..." }
-GET  /s/{token}                -> 只读分享落地页（HTML）
-POST /api/shares/view          -> 只读 JSON（不含预算、对话、待规划池）
+backend/
+  api/          HTTP 接口：认证、规划、行程、分享、预算、举报、健康检查
+  services/     高德、模型、LangGraph 规划、路线优化、配额、分享快照
+  db.py         数据模型与会话
+  schemas.py    请求/响应类型
+  main.py       应用初始化与路由注册
+frontend/src/
+  pages/        页面
+  components/   地图、时间线、预算、攻略导入等组件
+  lib/          接口工具
+  types/        共享类型
+  styles/       样式
+tests/          按接口、地图和规划职责组织的测试
+alembic/        数据库迁移
+scripts/        本地运行、预检与运维脚本
 ```
 
-以上请求需要浏览器已登录（会话 Cookie）；只读分享页和 `/api/shares/view` 不需要登录。分享 token 由服务端生成且只保存哈希，重新生成会撤销旧链接。
+开发约定见 [AGENTS.md](AGENTS.md)。
 
-## 7. 容量、健康检查与观测
+## 测试
 
-- `GET /api/health` 返回服务、数据库状态与版本号，可用于负载均衡/监控探活。
-- `GET /api/metrics` 是首周观测用的只读快照：未配置 `ADMIN_TOKEN` 时返回 404，配置后请求头带 `X-Admin-Token` 访问。重点字段：`requests.by_status.429`（限流命中）、`errors.by_kind`（数据库忙/连接池超时）、`email.by_outcome.unconfigured|failed`（注册/找回邮件是否发得出）、`latency_ms.avg|max`、`amap.place_hits|place_misses`（地点缓存）、`db.ok`、`disk.free_percent`、`pool.status`。计数在单进程内累计，重启清零；需要历史趋势或跨 worker 汇总时，把探针结果写入外部时序库。
-- 本地/测试默认单进程 Uvicorn + SQLite（WAL 模式）；生产推荐 PostgreSQL 16，当前仍以单进程运行。SQLite 同一时刻只允许一个写事务，不要用多个 Uvicorn worker 共享同一个数据库文件。
-- PostgreSQL 连接池默认 5+5、排队 10 秒、连接回收 30 分钟；SQLite 默认 10+20、排队 15 秒。SQLite 忙等待、出站 HTTP 连接数、高德地点缓存和模型并发都可通过环境变量调整，默认值见 `.env.example` 的「容量与重试」一节。
-- 限流、匿名日配额与实时协同在线名单在配置 `REDIS_URL` 后跨 worker 共享；未配置时仍是进程内实现，此时只能单 worker 运行。高德地点缓存、分享快照和模型并发闸门仍按进程各存一份，开多 worker 前需评估它们的一致性影响。
-- 模型调用遇到上游 408/429/5xx、连接失败或超时会自动重试一次；已开始输出的流式回答不会重放，避免前端看到重复文字。
-- 高德地点详情有 5 分钟进程内缓存，协作者轮询和分享页刷新不会每次重新请求全部地点。
+```bash
+python -m pytest tests -q
 
-## 8. 已知限制与数据说明
+cd frontend
+npm run typecheck
+npm test
+npm run build
+```
+
+仓库根目录的 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 push/PR 时执行同一组检查（后端 `pyflakes` + `pytest`，前端 `typecheck` + `test` + `build`），可作为合并前的门禁。
+
+自动化测试使用替代的第三方服务数据，并不能证明真实 API Key 可用、地图数据完整或行程适合实际出行。
+
+## 部署
+
+可以在国内服务器上按上述方式安装，准备 PostgreSQL 16 并执行 `python -m alembic upgrade head`，构建前端后由 FastAPI 提供网页，再用 Nginx 反向代理到仅监听 `127.0.0.1:8000` 的服务，配置域名及 HTTPS；用系统服务管理器保持 Uvicorn 运行。
+
+- 设置 `APP_ENV=production`、`APP_BASE_URL=https://你的域名`、`SESSION_SECRET`（至少 32 字节随机值）、`COOKIE_SECURE=true`。
+- 配置高德 JS Key 的安全域名，并确认 Web 服务 Key 只出现在服务端。
+- 数据库、`.env` 和访问日志放在服务器受限目录；不要提交 `.env`、`trip.db` 或真实密钥。
+- 反向代理需正确传递 `X-Forwarded-Proto` / `Host`，并限制 `/docs`、`/api/metrics` 等调试/管理入口的访问范围。
+- 使用 `GET /api/health` 做探活；需要观测时配置 `ADMIN_TOKEN`，再通过 `GET /api/metrics` 和 `X-Admin-Token` 读取只读快照。
+- 实际部署、域名、证书及服务商账号需要使用者自行提供。
+
+## 安全与数据
+
+- `.env`、`.session-secret`、数据库文件和本地 HTTPS 证书不会进入 Git；高德 Web 服务 Key 只在后端使用。
+- 会话使用 HttpOnly Cookie；生产环境要求 HTTPS 和 Secure Cookie；密码使用哈希存储。
+- 分享 token 只保存哈希；只读分享页不包含对话、预算和待规划池。
+- 账户支持导出资料和注销；注销会永久删除账号及关联数据，无法恢复。
+
+## 已知限制
 
 - 地点、开放时间和交通数据来自高德，并非对实际营业或出行时间的保证；缺失时显示未知。路线查询失败不会用直线代替。
 - 预算用于偏好和记账，不是报价；预约、票价和开放时间请出行前向官方确认。
@@ -511,17 +336,3 @@ POST /api/shares/view          -> 只读 JSON（不含预算、对话、待规�
 - 分享页是只读的，不包含预算、AI 对话和待规划池；删除行程或撤销链接后旧链接不可用。
 - 未配置 SMTP 时，邮箱验证和找回密码不会真正发信；未配置 Redis 时只能单进程运行；匿名配额和限流可能影响未登录试用。
 - 图片、地点数据保存与传递给模型的用途应在上线前根据实际高德服务协议确认授权。
-
-## 9. 检查
-
-```powershell
-python -m pytest tests -q
-cd frontend
-npm run typecheck
-npm test
-npm run build
-```
-
-仓库根目录的 `.github/workflows/ci.yml` 在 push/PR 时执行同一组检查（后端 `pyflakes` + `pytest`，前端 `typecheck` + `test` + `build`），可作为合并前的门禁；首次启用时需在 GitHub 上确认真实跑通。
-
-自动化测试使用替代的第三方服务数据，并不能证明真实 API Key 可用、地图数据完整或行程适合实际出行。
