@@ -41,8 +41,11 @@ frontend/src/test/
 .tmp-*
 .hallmark/
 
-# 内部开发资料（不进入首次公开提交）
+# 内部资料与开发文档（仅本地保留，不发布）
 docs/
+/AGENTS.md
+/CHANGELOG.md
+/backend/prompts/README.md
 
 # 编辑器与系统文件
 .DS_Store

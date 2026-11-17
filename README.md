@@ -291,8 +291,6 @@ alembic/        数据库迁移
 scripts/        本地运行、预检与运维脚本
 ```
 
-开发约定见 [AGENTS.md](AGENTS.md)。
-
 ## 部署
 
 可以在国内服务器上按上述方式安装，准备 PostgreSQL 16 并执行 `python -m alembic upgrade head`，构建前端后由 FastAPI 提供网页，再用 Nginx 反向代理到仅监听 `127.0.0.1:8000` 的服务，配置域名及 HTTPS；用系统服务管理器保持 Uvicorn 运行。
